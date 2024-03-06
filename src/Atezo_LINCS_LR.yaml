@@ -1,0 +1,38 @@
+EXPERIMENT_PARAMS:
+  drug: 'Atezo'
+  tissues: ['BLCA','KIRC']
+  geneset: 'LINCS'
+  rng_seed: 1234
+  transformations: ['curvature','weights','expression',"curvature-hist",'weights-pca','expression-pca','curvature-pca']
+  alpha: 0.5
+  min_TPM: 0.1
+  num_iters: 25
+  train_pct: 0.75
+  num_bins: 20
+  lower_bound: -5
+
+DIRECTORIES:
+  data_dir: "../data/expression/"
+  geneset_dir: "../data/genesets/"
+  network_dir: "../data/networks/"
+  results_dir: "../results/"
+
+
+NETWORK_PARAMS:
+  topology: 'tight'
+  weighting: 'unweighted'
+  min_distance: 0.00001
+
+FIELD_NAMES:
+  weight: 'weight'
+  rename: 'gene'
+  density: 'measure'
+  edge: 'ricci_curvature'
+
+
+MODEL_PARAMS:
+  model_name: 'LogisticRegression'
+  min_C: 0.01
+  max_C: 1
+  C_step: 0.1
+  max_iter: 10000
