@@ -11,9 +11,7 @@
 module purge
 
 
-configs=(./configs/Atezo_ALL.yaml,./configs/Atezo_COSMIC.yaml,./configs/Atezo_LINCS.yaml,\
-    ./configs/Nivo_ALL.yaml,./configs/Nivo_COSMIC.yaml,./configs/Nivo_LINCS.yaml,
-    ./configs/Pembro_ALL.yaml,./configs/Pembro_COSMIC.yaml,./configs/Pembro_LINCS.yaml)
+configs=(./configs/Atezo_ALL.yaml ./configs/Atezo_COSMIC.yaml ./configs/Atezo_LINCS.yaml ./configs/Nivo_ALL.yaml ./configs/Nivo_COSMIC.yaml ./configs/Nivo_LINCS.yaml ./configs/Pembro_ALL.yaml ./configs/Pembro_COSMIC.yaml ./configs/Pembro_LINCS.yaml)
 
 singularity exec --nv \
             --overlay /scratch/jjb509/ORCKernels/src/my_overlay.ext3:ro \
