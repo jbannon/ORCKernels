@@ -8,7 +8,8 @@ from collections import defaultdict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
+
 import tqdm
 import NetworkCurvature as nc
 from sklearn.decomposition import PCA
@@ -45,7 +46,7 @@ def parse_transform(
     ) -> Tuple[str,bool, bool]:
     if transform in ['curvature',"curvature-hist",'curvature-pca']:
         feature_map = 'edge_curvature'
-    elif transform in ['weights','weights-pca']:
+    elif transform in ['weights','weights-pca','weights-norm']:
         feature_map = 'edge_weight'
     else:
         feature_map = 'log2p1'
@@ -66,25 +67,28 @@ def featurize_data(
     data:pd.DataFrame,
     PPI_Graph:nx.Graph,
     feature_map:str,
-    idx_to_gene
+    idx_to_gene,
+    normalize:bool = False
     ):
     
     y = data['Response'].values
     data_subset = data.drop(['Run_ID','Response'],axis=1)
     
-
+    print(feature_map)
     if feature_map == 'log2p1':
         X = np.log2(data_subset.values+1)
     else:
         X = np.empty((data_subset.shape[0],len(PPI_Graph.edges())))
         for idx, row in tqdm.tqdm(data_subset.iterrows(), total = data_subset.shape[0]):
             G = PPI_Graph.copy()
+            total_weight = 0
             for edge in G.edges():
                 node1, node2 = edge[0], edge[1]
                 gene1, gene2 = idx_to_gene[node1], idx_to_gene[node2]
                 weight = np.round(np.log2(row[gene1]+1)*np.log2(row[gene2]+1),5)
                 G[node1][node2]['weight'] = weight
-            if feature_map == 'edge_weight':
+                total_weight+= weight
+            if feature_map == "edge_weight":
                  X[idx,:] =[e[2]['weight'] for e in G.edges(data=True)]
             elif feature_map == 'edge_curvature':
                 orc = nc.OllivierRicciCurvature(G)
@@ -186,16 +190,19 @@ def rename_nodes(
 def histogram_transform(
     X:np.array,
     num_bins:int,
-    lower_bound:int
+    lower_bound:Union[int,str] = 'adaptive'
     )->np.array:
     
-
+    if lower_bound =='adaptive':
+        lb = np.amin(X)
+    else:
+        lb = lower_bound
     X_ = np.empty((X.shape[0],num_bins))
-    bins = np.concatenate(([-np.inf], np.linspace(lower_bound,1,num = num_bins)))
+    bins = np.concatenate(([-np.inf], np.linspace(lb,1,num = num_bins)))
     
     for row in range(X.shape[0]):
         X_[row,:] = np.histogram(X[row,:],bins = bins)[0]
-    return X_
+    return X_, lb
     
 def make_model_and_param_grid(
     model_name:str,
@@ -204,7 +211,8 @@ def make_model_and_param_grid(
     reg_step:float,
     model_max_iters:int,
     do_pca:bool = False,
-    pca_dim: int = 20
+    pca_dim: int = 20,
+    gammas:List[Union[str,float]] = None
     ):
     
   
@@ -217,7 +225,10 @@ def make_model_and_param_grid(
         param_grid = {'clf__C':np.arange(reg_min,reg_max,reg_step)} 
     elif model_name == 'LinearSVM':
         classifier = ('clf',LinearSVC(class_weight = 'balanced',max_iter = model_max_iters))
-        param_grid = {'clf__C':np.arange(reg_min,reg_max,reg_step)} 
+        param_grid = {'clf__C':np.arange(reg_min,reg_max,reg_step)}
+    elif model_name == "RBF_SVM":
+        classifier = ('clf',SVC(kernel = 'rbf', class_weight = 'balanced'))
+        param_grid = {'clf__C':np.arange(reg_min,reg_max,reg_step), 'clf__gamma':gammas}
     
 
     

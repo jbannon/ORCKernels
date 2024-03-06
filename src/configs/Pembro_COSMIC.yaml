@@ -1,0 +1,45 @@
+EXPERIMENT_PARAMS:
+  drug: 'Pembro'
+  tissues: ['SKCM','STAD']
+  geneset: 'COSMIC'
+  rng_seed: 1234
+  transformations: ["curvature","weights","expression"]
+  alpha: 0.5
+  min_TPM: 0.1
+  num_iters: 50
+  train_pct: 0.75
+  num_bins: 20
+
+DIRECTORIES:
+  data_dir: "../data/expression/"
+  geneset_dir: "../data/genesets/"
+  network_dir: "../data/networks/"
+  results_dir: "../results/"
+
+
+NETWORK_PARAMS:
+  topology: 'tight'
+  weighting: 'unweighted'
+  min_distance: 0.00001
+
+FIELD_NAMES:
+  weight: 'weight'
+  rename: 'gene'
+  density: 'measure'
+  edge: 'ricci_curvature'
+
+
+MODEL_PARAMS:
+  LinearSVM:
+    reg_min: 0.01
+    reg_max: 2.5
+    reg_step: 0.1
+    model_max_iters: 10000
+  RBF_SVM:
+    reg_min: 0.01
+    reg_max: 2.5
+    reg_step: 0.1
+    model_max_iters: 10000
+    gammas: ['auto','scale',0.5,1.0,1.5,2,2.5,3,10]
+
+

@@ -1,15 +1,14 @@
 EXPERIMENT_PARAMS:
   drug: 'Atezo'
   tissues: ['BLCA','KIRC']
-  geneset: 'LINCS+COSMIC'
+  geneset: 'LINCS'
   rng_seed: 1234
-  transformations: ['curvature','weights','expression',"curvature-hist",'weights-pca','expression-pca','curvature-pca']
+  transformations: ["curvature","weights","expression"]
   alpha: 0.5
   min_TPM: 0.1
-  num_iters: 25
+  num_iters: 3
   train_pct: 0.75
   num_bins: 20
-  lower_bound: -5
 
 DIRECTORIES:
   data_dir: "../data/expression/"
@@ -31,8 +30,16 @@ FIELD_NAMES:
 
 
 MODEL_PARAMS:
-  model_name: 'LogisticRegression'
-  min_C: 0.01
-  max_C: 1
-  C_step: 0.1
-  max_iter: 10000
+  LinearSVM:
+    reg_min: 0.01
+    reg_max: 2.5
+    reg_step: 0.1
+    model_max_iters: 10000
+  RBF_SVM:
+    reg_min: 0.01
+    reg_max: 2.5
+    reg_step: 0.1
+    model_max_iters: 10000
+    gammas: ['auto','scale',0.5,1.0,1.5,2,2.5,3,10]
+
+
