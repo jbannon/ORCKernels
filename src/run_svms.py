@@ -5,12 +5,10 @@ from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 import time 
 from collections import defaultdict
-import matplotlib.pyplot as plt
 import argparse
 from typing import Dict, Union, List
 import sys
 import matplotlib.pyplot as plt
-from scipy import stats
 import pandas as pd
 import numpy as np 
 import networkx as nx
@@ -84,7 +82,7 @@ def main(
 	
 		res_path = "".join([result_dir,"/".join(["classification",drug,tissue,geneset]),"/"])
 		os.makedirs(res_path,exist_ok = True)
-		res_name = "{p}svm_classification .csv".format(p=res_path)
+		res_name = "{p}svm_classification.csv".format(p=res_path)
 		
 		network_file = utils.make_file_path(network_dir,[topology],weighting,".pickle")
 		with open(network_file,"rb") as istream:
