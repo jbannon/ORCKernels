@@ -6,7 +6,7 @@ EXPERIMENT_PARAMS:
   transformations: ["curvature","weights","expression"]
   alpha: 0.5
   min_TPM: 0.1
-  num_iters: 3
+  num_iters: 50
   train_pct: 0.75
   num_bins: 20
 
